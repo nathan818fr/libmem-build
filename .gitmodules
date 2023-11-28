@@ -1,0 +1,3 @@
+[submodule "local-env/vcvars-bash"]
+	path = local-env/vcvars-bash
+	url = https://github.com/nathan818fr/vcvars-bash.git
