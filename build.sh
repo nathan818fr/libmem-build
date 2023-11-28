@@ -130,7 +130,7 @@ function _build_in_docker() {
     -v "${source_dir}:/source:ro" \
     -v "${out_dir}:/out:rw" \
     -i "$docker_image" \
-    bash <<<"set -Eeuo pipefail; shopt -s inherit_errexit; $(declare -f do_build); do_build"
+    bash <<<"set -Eeuo pipefail; shopt -s inherit_errexit; $(declare -f do_build); do_build; exit 0"
 }
 
 function _build_locally() {
@@ -146,7 +146,7 @@ function _build_locally() {
     _BUILD_DIR="${g_temp_dir}/build" \
     _OUT_DIR="$out_dir" \
     "${REPO_DIR}/local-env/${local_env}.sh" "$local_env_arch" \
-    bash <<<"set -Eeuo pipefail; shopt -s inherit_errexit; $(declare -f do_build); do_build"
+    bash <<<"set -Eeuo pipefail; shopt -s inherit_errexit; $(declare -f do_build); do_build; exit 0"
 }
 
 # Perform the build and copy the results to the output directory.
