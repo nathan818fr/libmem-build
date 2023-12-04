@@ -206,6 +206,7 @@ function do_build() {
     copy_lib 'static/keystone-engine-prefix/src/keystone-engine-build/llvm/lib/keystone.lib'
     copy_lib 'static/lief-project-prefix/src/lief-project-build/LIEF.lib'
     copy_lib 'static/llvm.lib'
+    copy_lib 'static/injector.lib'
     ;;
   *)
     copy_lib 'shared/liblibmem.so'
@@ -214,6 +215,7 @@ function do_build() {
     copy_lib 'static/keystone-engine-prefix/src/keystone-engine-build/llvm/lib/libkeystone.a'
     copy_lib 'static/lief-project-prefix/src/lief-project-build/libLIEF.a'
     copy_lib 'static/libllvm.a'
+    copy_lib 'static/libinjector.a'
     ;;
   esac
 
@@ -237,10 +239,11 @@ function do_build() {
     done
   }
   copy_licenses 'libmem' './'
-  copy_licenses 'capstone'
-  copy_licenses 'keystone'
-  copy_licenses 'LIEF'
-  copy_licenses 'llvm'
+  copy_licenses 'capstone' 'external/capstone'
+  copy_licenses 'keystone' 'external/keystone'
+  copy_licenses 'LIEF' 'external/LIEF'
+  copy_licenses 'llvm' 'external/llvm'
+  copy_licenses 'injector' 'external/injector'
 
   # Add stdlib information (glibc version, musl version)
   printf '[+] Add stdlib information\n'
