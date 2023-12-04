@@ -19,8 +19,6 @@ jobs:
 
   prepare:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # allows the action to create a release
     outputs:
       source-version: ${{ steps.set-version.outputs.source-version }}
       artifact-version: ${{ steps.set-version.outputs.artifact-version }}
@@ -66,13 +64,6 @@ jobs:
           printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
         env:
           INPUT_PLATFORMS: ${{ inputs.platforms }}
-      - name: Create release
-        if: steps.set-version.outputs.release == 'true'
-        uses: ncipollo/release-action@v1
-        with:
-          omitBody: true
-          prerelease: true
-          token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     needs: prepare
@@ -80,8 +71,6 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: write # allows the action to upload a release asset
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,15 +84,27 @@ jobs:
           BUILD_VERSION: ${{ needs.prepare.outputs.source-version }}
           LIBMEM_BUILD_OUT_DIR: out/libmem-${{ needs.prepare.outputs.artifact-version }}-${{ matrix.platform }}
           MSYS: 'winsymlinks:sys' # fix symlink issues when cloning libmem on Windows
-      - name: Upload release asset
-        if: needs.prepare.outputs.release == 'true'
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: libmem-${{ needs.prepare.outputs.artifact-version }}-${{ matrix.platform }}
+          path: out/libmem-${{ needs.prepare.outputs.artifact-version }}-${{ matrix.platform }}.tar.gz
+
+  release:
+    needs: [prepare, build]
+    if: needs.prepare.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # allows the action to create a release
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
-          omitBodyDuringUpdate: true
-          omitNameDuringUpdate: true
-          artifacts: out/libmem-*.tar.gz
+          token: ${{ secrets.GITHUB_TOKEN }}
+          omitBody: true
+          prerelease: true
+          artifacts: libmem-*/libmem-*.tar.gz
           artifactContentType: application/gzip
           artifactErrorsFailBuild: true
-          prerelease: true
-          token: ${{ secrets.GITHUB_TOKEN }}
