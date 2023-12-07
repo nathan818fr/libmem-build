@@ -1,3 +1,6 @@
+> **Archived:** It has been merged upstream.<br>
+> ➡️ https://github.com/rdbo/libmem/releases
+
 # libmem-build
 
 Build script and pipeline to create pre-built binaries for [libmem].
